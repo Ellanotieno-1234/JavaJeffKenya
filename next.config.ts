@@ -7,12 +7,22 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://javajeffkenya-4-gf2j.onrender.com/api/:path*'  // Forward API requests to Render backend
+        destination: 'https://javajeffkenya-4-gf2j.onrender.com/api/:path*'
       }
     ];
   },
-  env: {
-    BACKEND_URL: 'https://javajeffkenya-4-gf2j.onrender.com'
+  async headers() {
+    return [
+      {
+        // Allow CORS for all API routes
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: '*' }
+        ]
+      }
+    ];
   }
 };
 

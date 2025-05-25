@@ -11,14 +11,20 @@ load_dotenv()
 # Get environment variables
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-PRODUCTION_URL = "https://javajeffkenya.onrender.com"
+VERCEL_URL = "https://java-jeff-kenya.vercel.app"  # Add your Vercel URL here
+RENDER_URL = "https://javajeffkenya-4-gf2j.onrender.com"
 
 app = FastAPI()
 
 # Add CORS middleware with environment-aware configuration
-origins = [FRONTEND_URL]
-if ENVIRONMENT == "production":
-    origins.append(PRODUCTION_URL)
+origins = [
+    FRONTEND_URL,
+    VERCEL_URL,
+    RENDER_URL,
+    "http://localhost:3000",
+    "https://javajeffkenya-4-gf2j.onrender.com",
+    # Add any additional domains that need access
+]
 
 app.add_middleware(
     CORSMiddleware,
