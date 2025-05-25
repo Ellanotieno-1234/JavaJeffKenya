@@ -10,6 +10,14 @@ interface PartsTableProps {
   onSort?: (options: SortOptions) => void;
 }
 
+// Utility function to safely convert any value to a renderable string
+const renderValue = (value: AviationPart[keyof AviationPart]): string => {
+  if (Array.isArray(value)) {
+    return `${value.length} items`;
+  }
+  return String(value);
+};
+
 const PartsTable: React.FC<PartsTableProps> = ({ parts, onSort }) => {
   const [selectedPart, setSelectedPart] = useState<AviationPart | null>(null);
   const [sortColumn, setSortColumn] = useState<keyof AviationPart | null>(null);
@@ -24,19 +32,22 @@ const PartsTable: React.FC<PartsTableProps> = ({ parts, onSort }) => {
       key: 'priority', 
       title: 'Priority', 
       sortable: true,
-      render: (value) => (
-        <motion.span 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className={`px-3 py-1 rounded-full text-sm ${
-            value === 'High' ? 'status-high' :
-            value === 'Medium' ? 'status-medium' :
-            'status-low'
-          }`}
-        >
-          {value}
-        </motion.span>
-      )
+      render: (value: unknown) => {
+        const priorityValue = String(value);
+        return (
+          <motion.span
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`px-3 py-1 rounded-full text-sm ${
+              priorityValue === 'High' ? 'status-high' :
+              priorityValue === 'Medium' ? 'status-medium' :
+              'status-low'
+            }`}
+          >
+            {priorityValue}
+          </motion.span>
+        );
+      }
     },
     { key: 'requiredQty', title: 'Required Qty', sortable: true },
   ];
@@ -239,9 +250,7 @@ const PartsTable: React.FC<PartsTableProps> = ({ parts, onSort }) => {
                   <td key={column.key} className="px-4 py-3 text-sm text-white">
                     {column.render
                       ? column.render(part[column.key], part)
-                      : Array.isArray(part[column.key])
-                        ? `${(part[column.key] as any[]).length} items`
-                        : String(part[column.key])
+                      : renderValue(part[column.key])
                     }
                   </td>
                 ))}
