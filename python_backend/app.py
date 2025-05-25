@@ -8,12 +8,21 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Get environment variables
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+PRODUCTION_URL = "https://javajeffkenya.onrender.com"
+
 app = FastAPI()
 
-# Add CORS middleware
+# Add CORS middleware with environment-aware configuration
+origins = [FRONTEND_URL]
+if ENVIRONMENT == "production":
+    origins.append(PRODUCTION_URL)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -222,6 +231,13 @@ async def get_analytics_summary():
         print(f"Error in get_analytics_summary: {error_message}")
         return {"error": error_message, "details": {"type": type(e).__name__}}
 
+# Handle startup differently in production vs development
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    host = "0.0.0.0"
+    
+    if ENVIRONMENT == "development":
+        uvicorn.run(app, host=host, port=port, reload=True)
+    else:
+        uvicorn.run(app, host=host, port=port)
