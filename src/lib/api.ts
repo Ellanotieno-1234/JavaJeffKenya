@@ -1,5 +1,5 @@
 // API utility functions for interacting with the Python backend
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, API_CONFIG } from './config';
 
 export async function uploadInventoryFile(file: File) {
   const formData = new FormData()
@@ -8,6 +8,8 @@ export async function uploadInventoryFile(file: File) {
   const response = await fetch(`${API_BASE_URL}/api/upload/inventory`, {
     method: 'POST',
     body: formData,
+    mode: 'cors',
+    credentials: 'omit',
   })
 
   if (!response.ok) {
@@ -24,6 +26,8 @@ export async function uploadOrdersFile(file: File) {
   const response = await fetch(`${API_BASE_URL}/api/upload/orders`, {
     method: 'POST',
     body: formData,
+    mode: 'cors',
+    credentials: 'omit',
   })
 
   if (!response.ok) {
@@ -34,7 +38,11 @@ export async function uploadOrdersFile(file: File) {
 }
 
 export async function fetchInventory() {
-  const response = await fetch(`${API_BASE_URL}/api/inventory`)
+  const response = await fetch(`${API_BASE_URL}/api/inventory`, {
+    method: 'GET',
+    ...API_CONFIG,
+    mode: 'cors',
+  })
   
   if (!response.ok) {
     throw new Error('Failed to fetch inventory data')
@@ -44,7 +52,11 @@ export async function fetchInventory() {
 }
 
 export async function fetchOrders() {
-  const response = await fetch(`${API_BASE_URL}/api/orders`)
+  const response = await fetch(`${API_BASE_URL}/api/orders`, {
+    method: 'GET',
+    ...API_CONFIG,
+    mode: 'cors',
+  })
   
   if (!response.ok) {
     throw new Error('Failed to fetch orders data')
@@ -54,7 +66,11 @@ export async function fetchOrders() {
 }
 
 export async function fetchAnalyticsSummary() {
-  const response = await fetch(`${API_BASE_URL}/api/analytics/summary`)
+  const response = await fetch(`${API_BASE_URL}/api/analytics/summary`, {
+    method: 'GET',
+    ...API_CONFIG,
+    mode: 'cors',
+  })
   
   if (!response.ok) {
     throw new Error('Failed to fetch analytics summary')

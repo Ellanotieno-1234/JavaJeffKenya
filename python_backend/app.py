@@ -10,21 +10,22 @@ load_dotenv()
 
 # Get environment variables
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-VERCEL_URL = "https://java-jeff-kenya.vercel.app"  # Add your Vercel URL here
-RENDER_URL = "https://javajeffkenya-4-gf2j.onrender.com"
 
-app = FastAPI()
+app = FastAPI(
+    title="Kenya Airways API",
+    description="API for Kenya Airways Inventory Management System",
+)
 
-# Add CORS middleware with environment-aware configuration
-origins = [
-    FRONTEND_URL,
-    VERCEL_URL,
-    RENDER_URL,
-    "http://localhost:3000",
-    "https://javajeffkenya-4-gf2j.onrender.com",
-    # Add any additional domains that need access
-]
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://java-jeff-kenya-airways.vercel.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
+)
 
 app.add_middleware(
     CORSMiddleware,
