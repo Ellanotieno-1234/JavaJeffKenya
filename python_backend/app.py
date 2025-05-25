@@ -9,24 +9,27 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(
-    title="Kenya Airways API",
-    description="API for Kenya Airways Inventory Management System",
-)
+# Initialize FastAPI app
+app = FastAPI()
 
-# Configure CORS
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins temporarily for debugging
-    allow_credentials=False,
-    allow_methods=["*"],
+    allow_origins=["https://java-jeff-kenya-airways.vercel.app"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+)
+
+# Initialize Supabase client
+supabase: Client = create_client(
+    os.getenv("SUPABASE_URL"),
+    os.getenv("SUPABASE_KEY")
 )
 
 @app.get("/")
 async def root():
-    """Health check endpoint."""
-    return {"status": "OK", "cors": "enabled"}
+    return {"status": "OK", "message": "API is running"}
 
 app.add_middleware(
     CORSMiddleware,
