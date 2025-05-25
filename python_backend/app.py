@@ -1,5 +1,6 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import pandas as pd
 from supabase import create_client, Client
 import os
@@ -8,24 +9,35 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Get environment variables
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
-
 app = FastAPI(
     title="Kenya Airways API",
     description="API for Kenya Airways Inventory Management System",
 )
 
-# Add CORS middleware
+# Add CORS middleware with specific configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://java-jeff-kenya-airways.vercel.app"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=[
+        "https://java-jeff-kenya-airways.vercel.app",
+        "http://localhost:3000",
+    ],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
-    expose_headers=["*"],
     max_age=3600,
 )
+
+@app.options("/{full_path:path}")
+async def options_route(full_path: str):
+    """Handle OPTIONS requests."""
+    return JSONResponse(
+        content="OK",
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
 
 app.add_middleware(
     CORSMiddleware,
