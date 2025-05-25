@@ -237,7 +237,12 @@ const PartsTable: React.FC<PartsTableProps> = ({ parts, onSort }) => {
               >
                 {columns.map((column) => (
                   <td key={column.key} className="px-4 py-3 text-sm text-white">
-                    {column.render ? column.render(part[column.key], part) : String(part[column.key])}
+                    {column.render
+                      ? column.render(part[column.key], part)
+                      : Array.isArray(part[column.key])
+                        ? `${(part[column.key] as any[]).length} items`
+                        : String(part[column.key])
+                    }
                   </td>
                 ))}
                 <td className="px-4 py-3 text-sm">
