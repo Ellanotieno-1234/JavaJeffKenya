@@ -9,23 +9,32 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+ALLOWED_ORIGINS = [
+    "https://java-jeff-kenya-airways.vercel.app",
+    "https://java-jeff-kenya-airways.vercel.app:443",
+    "http://localhost:3000"
+]
+
+# Initialize FastAPI app
 app = FastAPI(
     title="Kenya Airways API",
     description="API for Kenya Airways Inventory Management System",
 )
 
-# Add CORS middleware with specific configuration
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://java-jeff-kenya-airways.vercel.app",
-        "http://localhost:3000",
-    ],
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
-    max_age=3600,
+    expose_headers=["*"],
 )
+
+@app.get("/")
+async def root():
+    """Health check endpoint."""
+    return {"status": "OK", "cors": "enabled"}
 
 @app.options("/{full_path:path}")
 async def options_route(full_path: str):
