@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 export interface AllocatedOrder {
   orderNumber: string;
   orderLine: string;
@@ -58,5 +60,5 @@ export interface TableColumn {
   key: keyof AviationPart;
   title: string;
   sortable?: boolean;
-  render?: (value: any, part: AviationPart) => React.ReactNode;
+  render?: (value: AviationPart[keyof AviationPart], part: AviationPart) => ReactNode;
 }

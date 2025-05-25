@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { usePathname } from 'next/navigation'
-import { Card } from '@/components/ui/card'
 import { uploadInventoryFile, uploadOrdersFile } from '@/lib/api'
 
 export function FileUploader() {
@@ -47,7 +46,7 @@ export function FileUploader() {
             setSuccess('Successfully uploaded orders')
             window.dispatchEvent(new Event('ordersUpdated'))
           }
-        } catch (err) {
+        } catch {
           setError('Failed to upload orders. Please ensure the file format is correct and try again.')
         }
       } else {
@@ -64,7 +63,7 @@ export function FileUploader() {
               setSuccess('Inventory uploaded successfully. You can now upload orders.')
             }, 2000)
           }
-        } catch (err) {
+        } catch {
           setError('Failed to upload inventory. Please ensure the file format is correct and try again.')
         }
       }

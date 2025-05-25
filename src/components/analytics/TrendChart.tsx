@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,

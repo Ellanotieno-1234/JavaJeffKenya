@@ -87,8 +87,8 @@ export function AnalyticsChart() {
         })
 
         // Calculate forecast based on current demand plus 10%
-        for (let data of categoryMap.values()) {
-          data.forecast = Math.round(data.demand * 1.1)
+        for (const categoryData of categoryMap.values()) {
+          categoryData.forecast = Math.round(categoryData.demand * 1.1)
         }
 
         setData(Array.from(categoryMap.values()))

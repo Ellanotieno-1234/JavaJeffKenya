@@ -1,7 +1,6 @@
 "use client"
 
 import dynamic from 'next/dynamic'
-import { Suspense } from 'react'
 
 // Dynamically import chart components with loading optimization
 export const DynamicInventoryChart = dynamic(

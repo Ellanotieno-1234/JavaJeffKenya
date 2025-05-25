@@ -4,7 +4,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Bell, Settings, Menu, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
-import type { AviationPart } from '@/lib/types/aviation-parts';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

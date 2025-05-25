@@ -1,16 +1,28 @@
 import { useState, useCallback, useRef } from 'react'
 import { fetchInventory, fetchOrders } from '@/lib/api'
+import type { AviationPart } from '@/lib/types/aviation-parts'
 
-interface CachedData {
-  data: any
+interface CachedData<T> {
+  data: T
   timestamp: number
 }
+
+type InventoryData = AviationPart[]
+type OrdersData = Array<{
+  id: number
+  order_number: string
+  part_number: string
+  quantity: number
+  status: string
+  order_date: string
+}>
+
 
 const CACHE_DURATION = 30000 // 30 seconds cache
 
 export function useRefreshData() {
-  const inventoryCache = useRef<CachedData | null>(null)
-  const ordersCache = useRef<CachedData | null>(null)
+  const inventoryCache = useRef<CachedData<InventoryData> | null>(null)
+  const ordersCache = useRef<CachedData<OrdersData> | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
