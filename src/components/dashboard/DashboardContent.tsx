@@ -11,7 +11,7 @@ interface ChartData {
   total: number;
 }
 
-const data = [
+const data: ChartData[] = [
   {
     name: "Jan",
     total: 1320,
