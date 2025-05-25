@@ -7,9 +7,12 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://127.0.0.1:$PORT/api/:path*'  // Forward API requests to FastAPI backend
+        destination: 'https://javajeffkenya-4-gf2j.onrender.com/api/:path*'  // Forward API requests to Render backend
       }
     ];
+  },
+  env: {
+    BACKEND_URL: 'https://javajeffkenya-4-gf2j.onrender.com'
   }
 };
 
