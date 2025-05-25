@@ -1,26 +1,35 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # exit on error
 set -o errexit
 
 # Install system dependencies
-apt-get update && apt-get install -y \
-    build-essential \
-    python3-dev \
+apt-get update
+apt-get install -y \
+    python3-numpy \
+    python3-pandas \
     python3-pip \
-    python3-venv \
+    python3-dev \
+    libpq-dev \
     gcc \
-    g++
+    g++ \
+    gfortran \
+    musl-dev \
+    libffi-dev \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev
 
 # Create and activate virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Upgrade pip
+# Install build dependencies
 pip install --upgrade pip
+pip install wheel setuptools
+pip install --only-binary=:all: numpy==1.21.0
+pip install --only-binary=:all: pandas==1.3.0
 
-# Install Python dependencies
-pip install wheel
+# Install remaining requirements
 pip install -r requirements.txt
 
-# Make sure the script is executable
 chmod a+x build.sh
