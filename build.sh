@@ -1,10 +1,11 @@
 #!/bin/bash
-# exit on error
 set -o errexit
 
+# Move to python_backend directory
+cd python_backend
+
 # Install system dependencies
-apt-get update
-apt-get install -y \
+apt-get update && apt-get install -y \
     python3-numpy \
     python3-pandas \
     python3-pip \
@@ -29,7 +30,5 @@ pip install wheel setuptools
 pip install --only-binary=:all: numpy==1.21.0
 pip install --only-binary=:all: pandas==1.3.0
 
-# Install remaining requirements
+# Install requirements from python_backend directory
 pip install -r requirements.txt
-
-chmod a+x build.sh
