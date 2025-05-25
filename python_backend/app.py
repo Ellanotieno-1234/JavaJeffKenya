@@ -1,49 +1,31 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import pandas as pd
-from supabase import create_client, Client
-import os
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
-# Initialize FastAPI app with metadata
-app = FastAPI(
-    title="Kenya Airways API",
-    description="Inventory Management System API"
-)
-
-# Configure CORS middleware
-cors_options = {
-    "allow_origins": [
-        "https://java-jeff-kenya-airways.vercel.app",
-        "http://localhost:3000"
-    ],
-    "allow_credentials": True,
-    "allow_methods": ["*"],
-    "allow_headers": ["*"]
-}
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    **cors_options
-)
-
-# Initialize Supabase client
-supabase: Client = create_client(
-    os.getenv("SUPABASE_URL", ""),
-    os.getenv("SUPABASE_KEY", "")
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")
 async def root():
-    return {
-        "status": "OK",
-        "message": "API is running",
-        "cors_enabled": True
-    }
+    return {"status": "OK"}
+
+@app.get("/api/inventory")
+async def get_inventory():
+    return {"data": [], "message": "Test endpoint"}
+
+@app.get("/api/orders")
+async def get_orders():
+    return {"data": [], "message": "Test endpoint"}
+
+@app.get("/api/analytics/summary")
+async def get_analytics():
+    return {"data": {}, "message": "Test endpoint"}
 
 app.add_middleware(
     CORSMiddleware,
