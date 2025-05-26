@@ -22,7 +22,14 @@ export function AnalyticsSummary() {
     async function loadSummary() {
       try {
         const response = await fetchAnalyticsSummary()
-        setSummaryData(response?.data || null)
+        setSummaryData(response || {
+          total_parts: 0,
+          total_value: 0,
+          low_stock: 0,
+          backorders: 0,
+          turnover_rate: 0,
+          accuracy_rate: 0
+        })
       } catch (err) {
         setError('Failed to load analytics data')
         console.error('Error loading analytics:', err)

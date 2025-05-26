@@ -20,16 +20,15 @@ async function fetchWithCORS(url: string, options: RequestInit = {}) {
 
     if (!response.ok) {
       console.error(`API request failed: ${response.statusText}`);
-      // Return empty data structures instead of throwing
-      return { data: [] };
+      return [];
     }
 
     const data = await response.json();
-    return data;
+    // Handle both direct array responses and {data: []} responses
+    return Array.isArray(data) ? data : (data?.data || []);
   } catch (error) {
     console.error('API request error:', error);
-    // Return empty data structures on error
-    return { data: [] };
+    return [];
   }
 }
 
@@ -68,5 +67,12 @@ export async function fetchOrders() {
 }
 
 export async function fetchAnalyticsSummary() {
-  return fetchWithCORS(`${API_BASE_URL}/api/analytics/summary`);
+  try {
+    const response = await fetchWithCORS(`${API_BASE_URL}/api/analytics/summary`);
+    // Analytics summary is not an array, it's an object
+    return Array.isArray(response) ? null : response;
+  } catch (error) {
+    console.error('Failed to fetch analytics summary:', error);
+    return null;
+  }
 }

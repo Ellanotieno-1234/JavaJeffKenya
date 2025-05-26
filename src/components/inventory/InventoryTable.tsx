@@ -23,8 +23,8 @@ export function InventoryTable() {
   const loadInventory = async () => {
     try {
       setLoading(true)
-      const response = await fetchInventory()
-      setInventory(Array.isArray(response) ? response : response.data || [])
+      const data = await fetchInventory()
+      setInventory(data || [])
       setError(null)
     } catch (err) {
       setError('Failed to load inventory data')
