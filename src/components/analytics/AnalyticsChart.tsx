@@ -60,9 +60,10 @@ export function AnalyticsChart() {
 
         // Process inventory data
         inventoryData.forEach((item: InventoryItem) => {
-          if (!categoryMap.has(item.category)) {
-            categoryMap.set(item.category, {
-              category: item.category,
+        const category = item.category || 'Uncategorized';
+        if (!categoryMap.has(category)) {
+            categoryMap.set(category, {
+              category,
               demand: 0,
               supply: 0,
               backorder: 0,
@@ -70,7 +71,7 @@ export function AnalyticsChart() {
             })
           }
 
-          const categoryData = categoryMap.get(item.category)!
+          const categoryData = categoryMap.get(category)!
           categoryData.supply += item.in_stock
         })
 
@@ -78,7 +79,7 @@ export function AnalyticsChart() {
         ordersData.forEach((order: Order) => {
           const item = inventoryData.find((i: InventoryItem) => i.part_number === order.part_number)
           if (item) {
-            const categoryData = categoryMap.get(item.category)!
+          const categoryData = categoryMap.get(item.category || 'Uncategorized')!
             categoryData.demand += order.quantity
             if (order.status === 'Pending') {
               categoryData.backorder += order.quantity

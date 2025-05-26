@@ -7,21 +7,30 @@ const defaultHeaders = {
 };
 
 async function fetchWithCORS(url: string, options: RequestInit = {}) {
-  const response = await fetch(url, {
-    ...options,
-    mode: 'cors',
-    credentials: 'omit',
-    headers: {
-      ...defaultHeaders,
-      ...options.headers,
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      mode: 'cors',
+      credentials: 'omit',
+      headers: {
+        ...defaultHeaders,
+        ...options.headers,
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.statusText}`);
+    if (!response.ok) {
+      console.error(`API request failed: ${response.statusText}`);
+      // Return empty data structures instead of throwing
+      return { data: [] };
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('API request error:', error);
+    // Return empty data structures on error
+    return { data: [] };
   }
-
-  return response.json();
 }
 
 export async function uploadInventoryFile(file: File) {

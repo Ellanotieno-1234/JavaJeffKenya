@@ -65,11 +65,12 @@ export function TrendChart() {
         
         months.forEach(month => {
           const orderQuantity = monthlyOrders.get(month) || 0
-          const totalInventory = inventoryData.reduce((sum: number, item: InventoryItem) => sum + item.in_stock, 0)
-          const avgReorderPoint = inventoryData.reduce((sum: number, item: InventoryItem) => sum + item.min_required, 0) / inventoryData.length
+          const totalInventory = inventoryData?.reduce((sum: number, item: InventoryItem) => sum + (item.in_stock || 0), 0) || 0
+          const totalMinRequired = inventoryData?.reduce((sum: number, item: InventoryItem) => sum + (item.min_required || 0), 0) || 0
+          const avgReorderPoint = inventoryData?.length ? totalMinRequired / inventoryData.length : 0
 
           // Calculate turnover rate (monthly orders / average inventory)
-          const turnoverRate = orderQuantity / (totalInventory || 1) // Avoid division by zero
+          const turnoverRate = totalInventory > 0 ? orderQuantity / totalInventory : 0
 
           trendData.push({
             month,
