@@ -44,7 +44,7 @@ interface ChartData {
   forecast: number
 }
 
-export function AnalyticsChart() {
+function AnalyticsChart() {
   const [data, setData] = useState<ChartData[]>([])
 
   useEffect(() => {
@@ -138,3 +138,6 @@ export function AnalyticsChart() {
     </div>
   )
 }
+
+export { AnalyticsChart }
+export default AnalyticsChart

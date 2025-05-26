@@ -41,7 +41,7 @@ interface TrendData {
   reorderPoint: number
 }
 
-export function TrendChart() {
+function TrendChart() {
   const [data, setData] = useState<TrendData[]>([])
 
   useEffect(() => {
@@ -148,3 +148,6 @@ export function TrendChart() {
     </div>
   )
 }
+
+export { TrendChart }
+export default TrendChart

@@ -21,7 +21,8 @@ export default function InventoryChart() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const inventoryData = await fetchInventory()
+        const response = await fetchInventory()
+        const inventoryData = Array.isArray(response) ? response : response.data || []
         setData(inventoryData)
       } catch (error) {
         console.error('Failed to fetch inventory data:', error)

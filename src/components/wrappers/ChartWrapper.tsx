@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 
 // Dynamically import chart components with loading optimization
 export const DynamicInventoryChart = dynamic(
-  () => import('../inventory/InventoryChart').then(mod => mod.default),
+  () => import('../inventory/InventoryChart'),
   {
     ssr: false,
     loading: () => <ChartLoading />
@@ -12,7 +12,7 @@ export const DynamicInventoryChart = dynamic(
 )
 
 export const DynamicOrdersChart = dynamic(
-  () => import('../orders/OrdersChart').then(mod => mod.OrdersChart),
+  () => import('../orders/OrdersChart'),
   {
     ssr: false,
     loading: () => <ChartLoading />
@@ -20,7 +20,7 @@ export const DynamicOrdersChart = dynamic(
 )
 
 export const DynamicAnalyticsChart = dynamic(
-  () => import('../analytics/AnalyticsChart').then(mod => mod.AnalyticsChart),
+  () => import('../analytics/AnalyticsChart'),
   {
     ssr: false,
     loading: () => <ChartLoading />
@@ -28,7 +28,7 @@ export const DynamicAnalyticsChart = dynamic(
 )
 
 export const DynamicTrendChart = dynamic(
-  () => import('../analytics/TrendChart').then(mod => mod.TrendChart),
+  () => import('../analytics/TrendChart'),
   {
     ssr: false,
     loading: () => <ChartLoading />

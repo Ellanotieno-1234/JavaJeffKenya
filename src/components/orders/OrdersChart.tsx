@@ -32,15 +32,20 @@ interface ChartData {
   pending: number
 }
 
-export function OrdersChart() {
+function OrdersChart() {
   const [data, setData] = useState<ChartData[]>([])
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const ordersData = await fetchOrders()
+        const response = await fetchOrders()
+        const ordersData = Array.isArray(response) ? response : response.data || []
         
         // Group orders by date and count statuses
+        if (!ordersData.length) {
+          setData([])
+          return
+        }
         // Process orders data with proper typing
         const dataMap = new Map<string, ChartData>()
         
@@ -124,3 +129,6 @@ export function OrdersChart() {
     </div>
   )
 }
+
+export { OrdersChart }
+export default OrdersChart
