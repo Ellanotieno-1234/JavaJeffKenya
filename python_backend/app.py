@@ -5,8 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from supabase import create_client, Client
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+# Configure detailed logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
@@ -21,19 +24,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Supabase client
-supabase: Client = create_client(
-    os.getenv("SUPABASE_URL", ""),
-    os.getenv("SUPABASE_KEY", "")
-)
+# Initialize Supabase client with logging
+def init_supabase():
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_KEY")
+    logger.info(f"Initializing Supabase connection to URL: {url}")
+    if not url or not key:
+        logger.error("Missing Supabase credentials")
+        raise ValueError("Missing Supabase credentials")
+    return create_client(url, key)
+
+supabase: Client = init_supabase()
 
 @app.get("/api/inventory")
 async def get_inventory():
     try:
-        logger.info("Fetching inventory data")
+        logger.info("Fetching inventory data from Supabase")
         response = supabase.table("inventory").select("*").execute()
         inventory_data = response.data if response and hasattr(response, 'data') else []
         logger.info(f"Retrieved {len(inventory_data)} inventory items")
+        logger.debug(f"First inventory item sample: {inventory_data[0] if inventory_data else 'No data'}")
         return inventory_data
     except Exception as e:
         logger.error(f"Error fetching inventory: {str(e)}")
@@ -42,10 +52,11 @@ async def get_inventory():
 @app.get("/api/orders")
 async def get_orders():
     try:
-        logger.info("Fetching orders data")
+        logger.info("Fetching orders data from Supabase")
         response = supabase.table("orders").select("*").execute()
         orders_data = response.data if response and hasattr(response, 'data') else []
         logger.info(f"Retrieved {len(orders_data)} orders")
+        logger.debug(f"First order sample: {orders_data[0] if orders_data else 'No data'}")
         return orders_data
     except Exception as e:
         logger.error(f"Error fetching orders: {str(e)}")
@@ -54,25 +65,27 @@ async def get_orders():
 @app.get("/api/analytics/summary")
 async def get_analytics_summary():
     try:
-        logger.info("Calculating analytics summary")
+        logger.info("Starting analytics summary calculation")
         
-        # Fetch data
+        # Fetch data with validation
         inventory = await get_inventory()
         orders = await get_orders()
         
-        # Calculate metrics
-        total_parts = sum(item.get("in_stock", 0) for item in inventory)
-        total_value = sum(item.get("in_stock", 0) * 1000 for item in inventory)
-        low_stock = sum(1 for item in inventory if item.get("in_stock", 0) <= item.get("min_required", 0))
+        logger.info(f"Calculating metrics from {len(inventory)} inventory items and {len(orders)} orders")
+        
+        # Calculate metrics with validation
+        total_parts = sum(int(item.get("in_stock", 0)) for item in inventory)
+        total_value = sum(int(item.get("in_stock", 0)) * 1000 for item in inventory)
+        low_stock = sum(1 for item in inventory if int(item.get("in_stock", 0)) <= int(item.get("min_required", 0)))
         backorders = sum(1 for order in orders if order.get("status") == "Pending")
         
         summary = {
             "total_parts": total_parts,
-            "total_value": total_value,
+            "total_value": float(total_value),
             "low_stock": low_stock,
             "backorders": backorders,
-            "turnover_rate": 4.2 if total_parts > 0 else 0,
-            "accuracy_rate": 98.5 if total_parts > 0 else 0
+            "turnover_rate": float(4.2 if total_parts > 0 else 0),
+            "accuracy_rate": float(98.5 if total_parts > 0 else 0)
         }
         
         logger.info(f"Analytics summary calculated: {summary}")
@@ -94,15 +107,13 @@ async def upload_inventory(file: UploadFile = File(...)):
         logger.info(f"Processing inventory upload: {file.filename}")
         file_extension = file.filename.split('.')[-1].lower()
         
-        # Read file
-        if file_extension == 'csv':
-            df = pd.read_csv(file.file)
-        else:
-            df = pd.read_excel(file.file)
+        # Read file with validation
+        df = pd.read_csv(file.file) if file_extension == 'csv' else pd.read_excel(file.file)
+        logger.info(f"Read {len(df)} rows from uploaded file")
         
         # Process inventory data
         inventory_data = []
-        for _, row in df.iterrows():
+        for idx, row in df.iterrows():
             item = {
                 "part_number": str(row.get("Part Number", "")),
                 "name": str(row.get("Name", "")),
@@ -114,14 +125,18 @@ async def upload_inventory(file: UploadFile = File(...)):
             }
             inventory_data.append(item)
             
-            # Update or insert
-            existing = supabase.table("inventory").select("part_number").eq("part_number", item["part_number"]).execute()
-            if existing.data:
-                supabase.table("inventory").update(item).eq("part_number", item["part_number"]).execute()
-                logger.info(f"Updated inventory item: {item['part_number']}")
-            else:
-                supabase.table("inventory").insert(item).execute()
-                logger.info(f"Inserted new inventory item: {item['part_number']}")
+            # Update or insert with validation
+            try:
+                existing = supabase.table("inventory").select("part_number").eq("part_number", item["part_number"]).execute()
+                if existing.data:
+                    logger.info(f"Updating inventory item: {item['part_number']}")
+                    supabase.table("inventory").update(item).eq("part_number", item["part_number"]).execute()
+                else:
+                    logger.info(f"Inserting new inventory item: {item['part_number']}")
+                    supabase.table("inventory").insert(item).execute()
+            except Exception as e:
+                logger.error(f"Error processing inventory item {item['part_number']}: {str(e)}")
+                raise
         
         logger.info(f"Successfully processed {len(inventory_data)} inventory items")
         return {"success": True, "count": len(inventory_data)}
@@ -136,15 +151,13 @@ async def upload_orders(file: UploadFile = File(...)):
         logger.info(f"Processing orders upload: {file.filename}")
         file_extension = file.filename.split('.')[-1].lower()
         
-        # Read file
-        if file_extension == 'csv':
-            df = pd.read_csv(file.file)
-        else:
-            df = pd.read_excel(file.file)
+        # Read file with validation
+        df = pd.read_csv(file.file) if file_extension == 'csv' else pd.read_excel(file.file)
+        logger.info(f"Read {len(df)} rows from uploaded file")
         
         # Process orders data
         orders_data = []
-        for _, row in df.iterrows():
+        for idx, row in df.iterrows():
             order = {
                 "order_number": str(row.get("Order Number", "")),
                 "part_number": str(row.get("Part Number", "")),
@@ -157,10 +170,15 @@ async def upload_orders(file: UploadFile = File(...)):
             }
             orders_data.append(order)
         
-        # Insert orders
-        result = supabase.table("orders").insert(orders_data).execute()
-        logger.info(f"Successfully uploaded {len(orders_data)} orders")
-        return {"success": True, "count": len(orders_data)}
+        # Insert orders with validation
+        try:
+            result = supabase.table("orders").insert(orders_data).execute()
+            logger.info(f"Successfully uploaded {len(orders_data)} orders")
+            return {"success": True, "count": len(orders_data)}
+        except Exception as e:
+            logger.error(f"Error inserting orders: {str(e)}")
+            raise
+            
     except Exception as e:
         error_msg = str(e)
         logger.error(f"Error uploading orders: {error_msg}")
