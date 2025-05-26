@@ -47,10 +47,13 @@ export function TrendChart() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [inventoryData, ordersData] = await Promise.all([
+        const [inventoryResponse, ordersResponse] = await Promise.all([
           fetchInventory(),
           fetchOrders()
         ])
+        
+        const inventoryData = Array.isArray(inventoryResponse) ? inventoryResponse : inventoryResponse.data || []
+        const ordersData = Array.isArray(ordersResponse) ? ordersResponse : ordersResponse.data || []
 
         // Group orders by month
         const monthlyOrders = new Map<string, number>()

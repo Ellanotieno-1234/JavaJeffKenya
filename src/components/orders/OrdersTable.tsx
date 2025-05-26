@@ -24,8 +24,8 @@ export function OrdersTable() {
   const loadOrders = async () => {
     try {
       setLoading(true)
-      const data = await fetchOrders()
-      setOrders(data)
+      const response = await fetchOrders()
+      setOrders(Array.isArray(response) ? response : response.data || [])
       setError(null)
     } catch (err) {
       setError('Failed to load orders data')

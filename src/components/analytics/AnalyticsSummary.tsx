@@ -21,8 +21,8 @@ export function AnalyticsSummary() {
   useEffect(() => {
     async function loadSummary() {
       try {
-        const data = await fetchAnalyticsSummary()
-        setSummaryData(data)
+        const response = await fetchAnalyticsSummary()
+        setSummaryData(response?.data || null)
       } catch (err) {
         setError('Failed to load analytics data')
         console.error('Error loading analytics:', err)
