@@ -1,5 +1,10 @@
-from fastapi import FastAPI
+import os
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import pandas as pd
+from supabase import create_client, Client
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
 
 app = FastAPI()
 
@@ -27,13 +32,6 @@ async def get_orders():
 async def get_analytics():
     return {"data": {}, "message": "Test endpoint"}
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Initialize Supabase client
 supabase: Client = create_client(
