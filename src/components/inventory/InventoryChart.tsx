@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { fetchInventory } from '@/lib/api'
+import { useRefreshData } from '@/hooks/useRefreshData'
 
 interface InventoryItem {
   id: number
@@ -18,23 +19,25 @@ interface InventoryItem {
 export default function InventoryChart() {
   const [data, setData] = useState<InventoryItem[]>([])
 
+  const { refreshInventory } = useRefreshData()
+
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetchInventory()
-        const inventoryData = Array.isArray(response) ? response : response.data || []
-        setData(inventoryData)
+        const inventoryData = await refreshInventory(true)
+        setData(inventoryData || [])
       } catch (error) {
         console.error('Failed to fetch inventory data:', error)
       }
     }
-    
+
     loadData()
     
     // Refresh data when inventory is updated
-    window.addEventListener('inventoryUpdated', loadData)
-    return () => window.removeEventListener('inventoryUpdated', loadData)
-  }, [])
+    const handleUpdate = () => loadData()
+    window.addEventListener('inventoryUpdated', handleUpdate)
+    return () => window.removeEventListener('inventoryUpdated', handleUpdate)
+  }, [refreshInventory])
 
   return (
     <div className="w-full h-64">

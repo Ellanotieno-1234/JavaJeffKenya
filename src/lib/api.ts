@@ -27,8 +27,10 @@ async function fetchWithCORS(url: string, options: RequestInit = {}) {
     // Handle both direct array responses and {data: []} responses
     return Array.isArray(data) ? data : (data?.data || []);
   } catch (error) {
-    console.error('API request error:', error);
-    return [];
+      console.error('API request error:', error);
+      console.debug('API URL:', url);
+      console.debug('API Options:', options);
+      return [];
   }
 }
 
@@ -70,7 +72,15 @@ export async function fetchAnalyticsSummary() {
   try {
     const response = await fetchWithCORS(`${API_BASE_URL}/api/analytics/summary`);
     // Analytics summary is not an array, it's an object
-    return Array.isArray(response) ? null : response;
+    console.debug('Analytics response:', response);
+    return typeof response === 'object' && response !== null ? response : {
+      total_parts: 0,
+      total_value: 0,
+      low_stock: 0,
+      backorders: 0,
+      turnover_rate: 0,
+      accuracy_rate: 0
+    };
   } catch (error) {
     console.error('Failed to fetch analytics summary:', error);
     return null;

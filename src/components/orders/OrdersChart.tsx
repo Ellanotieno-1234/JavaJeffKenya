@@ -12,6 +12,7 @@ import {
   ResponsiveContainer
 } from 'recharts'
 import { fetchOrders } from '@/lib/api'
+import { useRefreshData } from '@/hooks/useRefreshData'
 
 interface Order {
   id: number
@@ -35,14 +36,13 @@ interface ChartData {
 function OrdersChart() {
   const [data, setData] = useState<ChartData[]>([])
 
+  const { refreshOrders } = useRefreshData()
+
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetchOrders()
-        const ordersData = Array.isArray(response) ? response : response.data || []
-        
-        // Group orders by date and count statuses
-        if (!ordersData.length) {
+        const ordersData = await refreshOrders(true)
+        if (!ordersData?.length) {
           setData([])
           return
         }
@@ -84,7 +84,7 @@ function OrdersChart() {
     // Refresh data when orders are updated
     window.addEventListener('ordersUpdated', loadData)
     return () => window.removeEventListener('ordersUpdated', loadData)
-  }, [])
+  }, [refreshOrders])
 
   return (
     <div className="w-full h-[300px]">

@@ -11,6 +11,10 @@ export function FileUploader() {
   const [success, setSuccess] = useState<string | null>(null)
   const pathname = usePathname()
 
+  const triggerAnalyticsUpdate = () => {
+    window.dispatchEvent(new Event('analyticsUpdated'))
+  }
+
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
     if (!file) return
@@ -44,7 +48,9 @@ export function FileUploader() {
             }
           } else {
             setSuccess('Successfully uploaded orders')
+            // Trigger both orders and analytics updates
             window.dispatchEvent(new Event('ordersUpdated'))
+            setTimeout(triggerAnalyticsUpdate, 500)
           }
         } catch {
           setError('Failed to upload orders. Please ensure the file format is correct and try again.')
@@ -57,7 +63,9 @@ export function FileUploader() {
             setError(result.error)
           } else {
             setSuccess('Successfully uploaded inventory items')
+            // Trigger both inventory and analytics updates
             window.dispatchEvent(new Event('inventoryUpdated'))
+            setTimeout(triggerAnalyticsUpdate, 500)
             // Add helpful message for next steps
             setTimeout(() => {
               setSuccess('Inventory uploaded successfully. You can now upload orders.')

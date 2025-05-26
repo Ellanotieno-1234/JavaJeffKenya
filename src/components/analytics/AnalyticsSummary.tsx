@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { fetchAnalyticsSummary } from "@/lib/api"
+import { useRefreshData } from "@/hooks/useRefreshData"
 
 interface AnalyticsSummary {
   total_parts: number
@@ -18,9 +19,13 @@ export function AnalyticsSummary() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const { refreshInventory, refreshOrders } = useRefreshData()
+
   useEffect(() => {
     async function loadSummary() {
       try {
+        // Force refresh of both inventory and orders data
+        await Promise.all([refreshInventory(true), refreshOrders(true)])
         const response = await fetchAnalyticsSummary()
         setSummaryData(response || {
           total_parts: 0,
@@ -39,7 +44,14 @@ export function AnalyticsSummary() {
     }
 
     loadSummary()
-  }, [])
+
+    // Listen for inventory and order updates
+    const handleUpdate = () => loadSummary()
+    window.addEventListener('analyticsUpdated', handleUpdate)
+    return () => {
+      window.removeEventListener('analyticsUpdated', handleUpdate)
+    }
+  }, [refreshInventory, refreshOrders])
 
   if (loading) {
     return <div className="text-center py-4">Loading analytics data...</div>
