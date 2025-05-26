@@ -96,7 +96,7 @@ export function AnalyticsSummary() {
       <Card>
         <CardContent className="pt-6">
           <div className="text-2xl font-bold">
-            {summaryData.turnover_rate.toFixed(1)}x
+            {(summaryData.turnover_rate ?? 0).toFixed(1)}x
           </div>
           <div className="text-sm text-muted-foreground">Inventory Turnover</div>
           <div className="mt-2 text-xs text-muted-foreground">
@@ -108,7 +108,7 @@ export function AnalyticsSummary() {
       <Card>
         <CardContent className="pt-6">
           <div className="text-2xl font-bold text-green-600">
-            {summaryData.accuracy_rate}%
+            {(summaryData.accuracy_rate ?? 0).toFixed(1)}%
           </div>
           <div className="text-sm text-muted-foreground">Inventory Accuracy</div>
           <div className="mt-2 text-xs text-muted-foreground">
