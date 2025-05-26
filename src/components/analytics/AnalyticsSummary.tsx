@@ -10,8 +10,8 @@ interface AnalyticsSummary {
   total_value: number
   low_stock: number
   backorders: number
-  turnover_rate: number
-  accuracy_rate: number
+  turnover_rate: number | null
+  accuracy_rate: number | null
 }
 
 export function AnalyticsSummary() {
@@ -86,7 +86,7 @@ export function AnalyticsSummary() {
       <Card>
         <CardContent className="pt-6">
           <div className="text-2xl font-bold">
-            ${(displayData.total_value / 1000000).toFixed(2)}M
+            ${(Number(displayData.total_value || 0) / 1000000).toFixed(2)}M
           </div>
           <div className="text-sm text-muted-foreground">Total Inventory Value</div>
           <div className="mt-2 text-xs text-muted-foreground">
@@ -122,7 +122,7 @@ export function AnalyticsSummary() {
       <Card>
         <CardContent className="pt-6">
           <div className="text-2xl font-bold">
-            {displayData.turnover_rate.toFixed(1)}x
+            {Number(displayData.turnover_rate || 0).toFixed(1)}x
           </div>
           <div className="text-sm text-muted-foreground">Inventory Turnover</div>
           <div className="mt-2 text-xs text-muted-foreground">
@@ -134,7 +134,7 @@ export function AnalyticsSummary() {
       <Card>
         <CardContent className="pt-6">
           <div className="text-2xl font-bold text-green-600">
-            {displayData.accuracy_rate.toFixed(1)}%
+            {Number(displayData.accuracy_rate || 0).toFixed(1)}%
           </div>
           <div className="text-sm text-muted-foreground">Inventory Accuracy</div>
           <div className="mt-2 text-xs text-muted-foreground">

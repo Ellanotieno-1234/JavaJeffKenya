@@ -81,11 +81,11 @@ async def get_analytics_summary():
         logger.error(f"Error calculating analytics: {str(e)}")
         return {
             "total_parts": 0,
-            "total_value": 0,
+            "total_value": 0.0,
             "low_stock": 0,
             "backorders": 0,
-            "turnover_rate": 0,
-            "accuracy_rate": 0
+            "turnover_rate": 0.0,
+            "accuracy_rate": 0.0
         }
 
 @app.post("/api/upload/inventory")

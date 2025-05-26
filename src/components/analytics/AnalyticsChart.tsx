@@ -55,8 +55,8 @@ function AnalyticsChart() {
           fetchOrders()
         ])
         
-        const inventoryData = Array.isArray(inventoryResponse) ? inventoryResponse : inventoryResponse.data || []
-        const ordersData = Array.isArray(ordersResponse) ? ordersResponse : ordersResponse.data || []
+        const inventoryData = Array.isArray(inventoryResponse) ? inventoryResponse : (inventoryResponse?.data || [])
+        const ordersData = Array.isArray(ordersResponse) ? ordersResponse : (ordersResponse?.data || [])
 
         // Group inventory by category
         const categoryMap = new Map<string, ChartData>()
@@ -75,7 +75,7 @@ function AnalyticsChart() {
           }
 
           const categoryData = categoryMap.get(category)!
-          categoryData.supply += item.in_stock
+          categoryData.supply += item.in_stock || 0
         })
 
         // Process orders data to calculate demand and backorders
@@ -83,7 +83,7 @@ function AnalyticsChart() {
           const item = inventoryData.find((i: InventoryItem) => i.part_number === order.part_number)
           if (item) {
           const categoryData = categoryMap.get(item.category || 'Uncategorized')!
-            categoryData.demand += order.quantity
+            categoryData.demand += order.quantity || 0
             if (order.status === 'Pending') {
               categoryData.backorder += order.quantity
             }
@@ -92,7 +92,10 @@ function AnalyticsChart() {
 
         // Calculate forecast based on current demand plus 10%
         for (const categoryData of categoryMap.values()) {
-          categoryData.forecast = Math.round(categoryData.demand * 1.1)
+          // Ensure forecast is a safe number
+  const demand = categoryData.demand || 0
+  const forecast = Math.max(0, demand * 1.1);
+          categoryData.forecast = Math.round(forecast);
         }
 
         setData(Array.from(categoryMap.values()))

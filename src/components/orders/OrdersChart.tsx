@@ -61,19 +61,26 @@ function OrdersChart() {
           }
           
           const dayData = dataMap.get(date)!
-          dayData.orders++
+          const quantity = Number(order.quantity || 0);
+          dayData.orders += quantity;
           if (order.status === 'Completed') {
-            dayData.completed++
+            dayData.completed += quantity;
           } else if (order.status === 'Pending') {
-            dayData.pending++
+            dayData.pending += quantity;
           }
         })
 
-        // Convert to array and sort by date
+        // Convert to array, sort by date, and ensure values are numbers
         const chartData: ChartData[] = Array.from(dataMap.values())
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .map(item => ({
+            ...item,
+            orders: Number(item.orders || 0),
+            completed: Number(item.completed || 0),
+            pending: Number(item.pending || 0)
+          }));
 
-        setData(chartData)
+        setData(chartData);
       } catch (error) {
         console.error('Failed to fetch orders data:', error)
       }

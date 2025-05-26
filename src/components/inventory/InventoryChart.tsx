@@ -49,9 +49,27 @@ export default function InventoryChart() {
           <XAxis dataKey="name" />
           <YAxis label={{ value: 'Quantity', angle: -90, position: 'insideLeft' }} />
           <Tooltip />
-          <Bar dataKey="in_stock" name="In Stock" fill="#4f46e5" />
-          <Bar dataKey="min_required" name="Min Required" fill="#ef4444" />
-          <Bar dataKey="on_order" name="On Order" fill="#22c55e" />
+          <Bar 
+            dataKey="in_stock" 
+            name="In Stock" 
+            fill="#4f46e5"
+            isAnimationActive={true}
+            animationDuration={500}
+          />
+          <Bar 
+            dataKey="min_required" 
+            name="Min Required" 
+            fill="#ef4444"
+            isAnimationActive={true}
+            animationDuration={500}
+          />
+          <Bar 
+            dataKey="on_order" 
+            name="On Order" 
+            fill="#22c55e"
+            isAnimationActive={true}
+            animationDuration={500}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

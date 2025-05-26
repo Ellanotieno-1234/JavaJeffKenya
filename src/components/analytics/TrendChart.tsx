@@ -52,8 +52,8 @@ function TrendChart() {
           fetchOrders()
         ])
         
-        const inventoryData = Array.isArray(inventoryResponse) ? inventoryResponse : inventoryResponse.data || []
-        const ordersData = Array.isArray(ordersResponse) ? ordersResponse : ordersResponse.data || []
+        const inventoryData = Array.isArray(inventoryResponse) ? inventoryResponse : (inventoryResponse?.data || [])
+        const ordersData = Array.isArray(ordersResponse) ? ordersResponse : (ordersResponse?.data || [])
 
         // Group orders by month
         const monthlyOrders = new Map<string, number>()
@@ -67,18 +67,18 @@ function TrendChart() {
         const months = Array.from(monthlyOrders.keys()).sort()
         
         months.forEach(month => {
-          const orderQuantity = monthlyOrders.get(month) || 0
-          const totalInventory = inventoryData?.reduce((sum: number, item: InventoryItem) => sum + (item.in_stock || 0), 0) || 0
-          const totalMinRequired = inventoryData?.reduce((sum: number, item: InventoryItem) => sum + (item.min_required || 0), 0) || 0
-          const avgReorderPoint = inventoryData?.length ? totalMinRequired / inventoryData.length : 0
+          const orderQuantity = Number(monthlyOrders.get(month) || 0)
+          const totalInventory = inventoryData?.reduce((sum: number, item: InventoryItem) => sum + Number(item.in_stock || 0), 0) || 0
+          const totalMinRequired = inventoryData?.reduce((sum: number, item: InventoryItem) => sum + Number(item.min_required || 0), 0) || 0
+          const avgReorderPoint = Math.max(0, inventoryData?.length ? totalMinRequired / inventoryData.length : 0)
 
           // Calculate turnover rate (monthly orders / average inventory)
-          const turnoverRate = totalInventory > 0 ? orderQuantity / totalInventory : 0
+          const turnoverRate = totalInventory > 0 ? Math.max(0, Number((orderQuantity / totalInventory).toFixed(2))) : 0
 
           trendData.push({
             month,
             inventory: totalInventory,
-            turnover: Number(turnoverRate.toFixed(2)),
+            turnover: turnoverRate,
             reorderPoint: avgReorderPoint
           })
         })

@@ -1,39 +1,7 @@
 "use client"
 
 import dynamic from 'next/dynamic'
-
-// Dynamically import chart components with loading optimization
-export const DynamicInventoryChart = dynamic(
-  () => import('../inventory/InventoryChart'),
-  {
-    ssr: false,
-    loading: () => <ChartLoading />
-  }
-)
-
-export const DynamicOrdersChart = dynamic(
-  () => import('../orders/OrdersChart'),
-  {
-    ssr: false,
-    loading: () => <ChartLoading />
-  }
-)
-
-export const DynamicAnalyticsChart = dynamic(
-  () => import('../analytics/AnalyticsChart'),
-  {
-    ssr: false,
-    loading: () => <ChartLoading />
-  }
-)
-
-export const DynamicTrendChart = dynamic(
-  () => import('../analytics/TrendChart'),
-  {
-    ssr: false,
-    loading: () => <ChartLoading />
-  }
-)
+import { Suspense } from 'react'
 
 // Enhanced loading component with skeleton animation
 const ChartLoading = () => (
@@ -48,8 +16,77 @@ const ChartLoading = () => (
   </div>
 )
 
-// Optimized wrapper components
-export const InventoryChartWrapper = DynamicInventoryChart
-export const OrdersChartWrapper = DynamicOrdersChart
-export const AnalyticsChartWrapper = DynamicAnalyticsChart
-export const TrendChartWrapper = DynamicTrendChart
+const ChartErrorBoundary = ({ children }: { children: React.ReactNode }) => {
+  try {
+    return <>{children}</>
+  } catch (error) {
+    console.error('Chart rendering error:', error)
+    return <div className="text-red-500">Failed to load chart</div>
+  }
+}
+
+// Dynamically import chart components with loading optimization
+const DynamicInventoryChart = dynamic(
+  () => import('../inventory/InventoryChart'),
+  {
+    ssr: false,
+    loading: ChartLoading
+  }
+)
+
+const DynamicOrdersChart = dynamic(
+  () => import('../orders/OrdersChart'),
+  {
+    ssr: false,
+    loading: ChartLoading
+  }
+)
+
+const DynamicAnalyticsChart = dynamic(
+  () => import('../analytics/AnalyticsChart'),
+  {
+    ssr: false,
+    loading: ChartLoading
+  }
+)
+
+const DynamicTrendChart = dynamic(
+  () => import('../analytics/TrendChart'),
+  {
+    ssr: false,
+    loading: ChartLoading
+  }
+)
+
+// Wrapper components with error boundaries and suspense
+export const InventoryChartWrapper = () => (
+  <ChartErrorBoundary>
+    <Suspense fallback={<ChartLoading />}>
+      <DynamicInventoryChart />
+    </Suspense>
+  </ChartErrorBoundary>
+)
+
+export const OrdersChartWrapper = () => (
+  <ChartErrorBoundary>
+    <Suspense fallback={<ChartLoading />}>
+      <DynamicOrdersChart />
+    </Suspense>
+  </ChartErrorBoundary>
+)
+
+export const AnalyticsChartWrapper = () => (
+  <ChartErrorBoundary>
+    <Suspense fallback={<ChartLoading />}>
+      <DynamicAnalyticsChart />
+    </Suspense>
+  </ChartErrorBoundary>
+)
+
+export const TrendChartWrapper = () => (
+  <ChartErrorBoundary>
+    <Suspense fallback={<ChartLoading />}>
+      <DynamicTrendChart />
+    </Suspense>
+  </ChartErrorBoundary>
+)
